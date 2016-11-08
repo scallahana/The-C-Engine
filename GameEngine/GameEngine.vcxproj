@@ -146,9 +146,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="graphicsclass.cpp" />
+    <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="systemc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="graphics.h" />
+    <ClInclude Include="input.h" />
     <ClInclude Include="systemc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
