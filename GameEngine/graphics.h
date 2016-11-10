@@ -4,13 +4,13 @@
 #define _GRAPHICSCLASS_H_
 
 //includes
-#include <windows.h>
+#include "d3d.h"
 ////
 
 //Globals
 //
 //////////
-const bool full_screen = true;
+const bool full_screen = false;
 const bool Vsync_enabled = true;
 const float Screen_depth = 1000.0f;
 const float Screen_near = 0.1f;
@@ -33,6 +33,8 @@ private:
 	bool Render();
 
 private:
+
+	D3DClass* m_D3D;
 
 };
 
