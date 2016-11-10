@@ -26,11 +26,36 @@ public:
 	D3DClass(const D3DClass&);
 	~D3DClass();
 
-	bool Initialize(int, int, HWND, bool, float, float);
+	bool Initialize(int, int, bool, HWND, bool, float, float);
 	void ShutDown();
 
-	void BeginScene();
+	void BeginScene(float, float, float, float);
 	void EndScene();
+
+	ID3D11Device* GetDevice();
+	ID3D11DeviceContext* GetDeviceContext();
+
+	void GetProjectionMatrix(D3DXMATRIX&);
+	void GetWorldMatrix(D3DMATRIX&);
+	void GetOrthoMatrix(D3DXMATRIX&);
+
+	void GetVideoCardInfo(char*, int&);
+
+private:
+	bool m_Vsync_Enabled;
+	int m_VideoMemory;
+	char m_VideoCardDesc[128];
+	IDXGISwapChain* m_SwapChain;
+	ID3D11Device* m_Device;
+	ID3D11DeviceContext* m_DeviceContext;
+	ID3D11RenderTargetView* m_RenderTarget_View;
+	ID3D11Texture2D* m_DepthStencilBuffer;
+	ID3D11DepthStencilState* m_DepthStencilState;
+	ID3D11DepthStencilView* m_DepthStencilView;
+	ID3D11RasterizerState* m_RasterState;
+	D3DMATRIX m_ProjectionMatrix;
+	D3DMATRIX m_WorldMatrix;
+	D3DMATRIX m_OrthoMatrix;
 
 };
 #endif // !_D3DCLASS_H_
