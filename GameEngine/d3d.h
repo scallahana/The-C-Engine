@@ -53,9 +53,9 @@ private:
 	ID3D11DepthStencilState* m_DepthStencilState;
 	ID3D11DepthStencilView* m_DepthStencilView;
 	ID3D11RasterizerState* m_RasterState;
-	D3DMATRIX m_ProjectionMatrix;
-	D3DMATRIX m_WorldMatrix;
-	D3DMATRIX m_OrthoMatrix;
+	D3DXMATRIX m_ProjectionMatrix;
+	D3DXMATRIX m_WorldMatrix;
+	D3DXMATRIX m_OrthoMatrix;
 
 };
 #endif // !_D3DCLASS_H_

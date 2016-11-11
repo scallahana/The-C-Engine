@@ -107,7 +107,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	//Convert name of video card  to char array and store it
 	error = wcstombs_s(&stringLength, m_VideoCardDesc, 128, adapterDesc.Description,
 		128);
-	if(error != 0)
+	if (error != 0)
 	{
 		return false;
 	}
@@ -131,4 +131,210 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	//Will finish the rest of this extremely long method tomorrow 
 	//Or the day after one of the two.
 
+	//Init swap chain
+	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
+
+	//set to single back buffer
+	swapChainDesc.BufferCount = 1;
+
+	//swt width and height
+	swapChainDesc.BufferDesc.Width = screenWidth;
+	swapChainDesc.BufferDesc.Height = screenHeight;
+
+
+	//Set reg to 32 bit. for back buffer
+	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+	//set refresh rate to back buffer;
+	if (m_Vsync_Enabled)
+	{
+		swapChainDesc.BufferDesc.RefreshRate.Numerator = numerator;
+		swapChainDesc.BufferDesc.RefreshRate.Denominator = denominator;
+	} else {
+		swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
+		swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+	}
+
+	//Set usage of back buffer
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+
+	//set handle for the winder to render to .
+	swapChainDesc.OutputWindow = hwnd;
+
+	//Turn MS off
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.SampleDesc.Quality = 0;
+
+	//set to fullscreen or naw
+	if (fullscreen)
+	{
+		swapChainDesc.Windowed = false;
+	} else {
+
+		swapChainDesc.Windowed = true;
+
+	}
+
+	//Set scan line ordering  and scailing to not specified.
+	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+
+
+	//discard back buffer contents after processing.
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+	//dont set advanced flags
+	swapChainDesc.Flags = 0;
+
+	//feature level;
+	featureLevel = D3D_FEATURE_LEVEL_11_0;
+
+	//create swap chain
+	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &featureLevel, 1,
+		D3D11_SDK_VERSION, &swapChainDesc, &m_SwapChain, &m_Device, NULL, &m_DeviceContext);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	//Get pointer to back buffer
+	result = m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	//Release pointer
+	backBufferPtr->Release();
+	backBufferPtr = 0;
+
+	//Init depth buffer desc
+	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
+
+
+	//Setup desc of depth buffer
+	depthBufferDesc.Width = screenWidth;
+	depthBufferDesc.Height = screenHeight;
+	depthBufferDesc.MipLevels = 1;
+	depthBufferDesc.ArraySize = 1;
+	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthBufferDesc.SampleDesc.Count = 1;
+	depthBufferDesc.SampleDesc.Quality = 0;
+	depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthBufferDesc.CPUAccessFlags = 0;
+	depthBufferDesc.MiscFlags = 0;
+
+	//create texture for depth buffer
+	result = m_Device->CreateTexture2D(&depthBufferDesc, NULL, &m_DepthStencilBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	//Init the description of stencil state
+	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+
+	//Setup description for stencil state
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	depthStencilDesc.StencilEnable = true;
+	depthStencilDesc.StencilReadMask = 0xFF;
+	depthStencilDesc.StencilWriteMask = 0xFF;
+
+	//Stencil ops if pixel is front facing;
+	depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	//stencil ops if pixel is back facing
+	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	//create depth stencil state
+	result = m_Device->CreateDepthStencilState(&depthStencilDesc, &m_DepthStencilState);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	//set depth stencil state
+	m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState, 1);
+
+	//init the stencil view
+	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
+
+	//Setup stencil view description
+	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	depthStencilViewDesc.Texture2D.MipSlice = 0;
+
+	//create stencil view
+	result = m_Device->CreateDepthStencilView(m_DepthStencilBuffer, &depthStencilViewDesc, &m_DepthStencilView);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	//bind render target view and depth stencil buffer to output pipeline
+	m_DeviceContext->OMSetRenderTargets(1, &m_RenderTarget_View, m_DepthStencilView);
+
+	//Setup rasterizer desc
+	rasterizerDesc.AntialiasedLineEnable = false;
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerDesc.DepthBias = 0;
+	rasterizerDesc.DepthBiasClamp = 0.0f;
+	rasterizerDesc.DepthClipEnable = true;
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.FrontCounterClockwise = false;
+	rasterizerDesc.MultisampleEnable = false;
+	rasterizerDesc.ScissorEnable = false;
+	rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+
+	//create rasterizer state from desc
+	result = m_Device->CreateRasterizerState(&rasterizerDesc, &m_RasterState);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	//set rasterizer state
+	m_DeviceContext->RSSetState(m_RasterState);
+
+	//Setup viewport
+	viewport.Width = (float)screenWidth;
+	viewport.Height = (float)screenHeight;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	viewport.TopLeftX = 0.0f;
+	viewport.TopLeftY = 0.0f;
+
+	//Create viewport
+	m_DeviceContext->RSSetViewports(1, &viewport);
+
+
+	//Setup projection matrix.
+	FOV = (float)D3DX_PI / 4.0f;
+	screenAspect = (float)screenWidth / (float)screenHeight;
+
+	//Create matrix for rendering
+	D3DXMatrixPerspectiveFovLH(&m_ProjectionMatrix, FOV, screenAspect, screenNear, screenDepth);
+
+	//INIT world matrix
+	D3DXMatrixIdentity(&m_WorldMatrix);
+
+	 // Create an ortho projection  for 2D rendering.
+	D3DXMatrixOrthoLH(&m_OrthoMatrix, (float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+
+	return true;
+}
+
+void D3DClass::ShutDown()
+{
+	//Will finish method in the morning.
 }
