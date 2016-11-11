@@ -47,7 +47,7 @@ void GraphicsClass::Shutdown()
 {
 	if (m_D3D)
 	{
-		m_D3D->Shutdown();
+		m_D3D->ShutDown();
 		
 		delete m_D3D;
 		
@@ -78,7 +78,7 @@ bool GraphicsClass::Render()
 {
 
 	//Clear buffers to begin scene
-	m_D3D->BeginScene(0.5f, 0.5f, 0.5f, 1.0f);
+	m_D3D->BeginScene(0.9f, 0.23f, 0.1f, 1.0f);
 
 	//Present rendered scene;
 	m_D3D->EndScene();

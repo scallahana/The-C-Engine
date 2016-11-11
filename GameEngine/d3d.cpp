@@ -2,7 +2,8 @@
 ///////////////////
 
 #include "d3d.h"
-
+#include <iostream>
+#include <fstream>
 D3DClass::D3DClass()
 {
 	m_SwapChain = 0;
@@ -78,6 +79,12 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		return false;
 	}
 
+	//Actually assign a value to a variable
+	displayModeList = new DXGI_MODE_DESC[numModes];
+	if (!displayModeList)
+	{
+		return false;
+	}
 
 	//Create a list to hold all display modes that matches screenWidth and height when 
 	//found store it to the numerator and denominator of the refresh for moniter.
@@ -336,5 +343,136 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 
 void D3DClass::ShutDown()
 {
-	//Will finish method in the morning.
+	//Before closing set to window mode. or it will throw and exception
+	if (m_SwapChain)
+	{
+		m_SwapChain->SetFullscreenState(false, NULL);
+	}
+
+	if (m_RasterState)
+	{
+		m_RasterState->Release();
+		m_RasterState = 0;
+	}
+
+	
+	if (m_DepthStencilView)
+	{
+		m_DepthStencilView->Release();
+		m_DepthStencilView = 0;
+	}
+
+	
+	if (m_DepthStencilState)
+	{
+		m_DepthStencilState->Release();
+		m_DepthStencilState = 0;
+	}
+	
+		
+
+	if (m_DepthStencilBuffer)
+	{
+		m_DepthStencilBuffer->Release();
+		m_DepthStencilBuffer = 0;
+	}
+
+	if (m_RenderTarget_View)
+	{
+		m_RenderTarget_View->Release();
+		m_RenderTarget_View = 0;
+	}
+
+	if (m_DeviceContext)
+	{
+		m_DeviceContext->Release();
+		m_DeviceContext = 0;
+	}
+
+	if (m_Device)
+	{
+		m_Device->Release();
+		m_Device = 0;
+	}
+
+	if (m_SwapChain)
+	{
+		m_SwapChain->Release();
+		m_SwapChain = 0;
+	}
+
+	return;
+}
+
+void D3DClass::BeginScene(float red, float green, float blue, float alpha)
+{
+	float color[4];
+
+	//Set color to clear buffer to.
+	color[0] = red;
+	color[1] = green;
+	color[2] = blue;
+	color[3] = alpha;
+
+	//Clear back buffer
+	m_DeviceContext->ClearRenderTargetView(m_RenderTarget_View, color);
+
+	//Clear depth buffer
+	m_DeviceContext->ClearDepthStencilView(m_DepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	return;
+}
+
+void D3DClass::EndScene()
+{
+	//Present the back buffer to the screen rendering is done.
+	if (m_Vsync_Enabled)
+	{
+		//Lock to screen refresh rate I.E mine is 75Hz;
+		m_SwapChain->Present(1, 0);
+	}
+	else
+	{
+		//Present asap.
+		m_SwapChain->Present(0, 0);
+	}
+
+	return;
+}
+
+ID3D11Device* D3DClass::GetDevice()
+{
+	return m_Device;
+}
+
+ID3D11DeviceContext* D3DClass::GetDeviceContext()
+{
+	return m_DeviceContext;
+}
+
+void D3DClass::GetProjectionMatrix(D3DXMATRIX& projectionMatrix)
+{
+	projectionMatrix = m_ProjectionMatrix;
+	return;
+}
+
+void D3DClass::GetWorldMatrix(D3DXMATRIX& worldMatrix)
+{
+	worldMatrix = m_WorldMatrix;
+	return;
+}
+
+void D3DClass::GetOrthoMatrix(D3DXMATRIX& orthoMatrix)
+{
+	orthoMatrix = m_OrthoMatrix;
+	return;
+}
+
+void D3DClass::GetVideoCardInfo(char* cardName, int& memory)
+{
+
+	//print all of this to a file!
+	 strcpy_s(cardName, 128, m_VideoCardDesc);
+	memory = m_VideoMemory;
+	return;
 }
