@@ -30,6 +30,9 @@
     <ClCompile Include="d3d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="systemc.h">
@@ -44,5 +47,19 @@
     <ClInclude Include="d3d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Color.vs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="Color.ps">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
