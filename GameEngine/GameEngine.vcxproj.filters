@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{31dd7ac3-34ee-4508-90aa-5a8aaad3cf39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -58,11 +61,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Color.vs">
-      <Filter>Source Files</Filter>
+    <None Include="Shaders\Color.ps">
+      <Filter>Shaders</Filter>
     </None>
-    <None Include="Color.ps">
-      <Filter>Source Files</Filter>
+    <None Include="Shaders\Color.vs">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -164,8 +164,8 @@
     <ClInclude Include="systemc.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Color.ps" />
-    <None Include="Color.vs" />
+    <None Include="Shaders\Color.ps" />
+    <None Include="Shaders\Color.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
