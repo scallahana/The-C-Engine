@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ColorShader.cpp" />
     <ClCompile Include="d3d.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="systemc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="ColorShader.h" />
     <ClInclude Include="d3d.h" />
     <ClInclude Include="graphics.h" />
