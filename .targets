@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--Gather all image files under the Content dir, with .png, .jpg or .bmp extension-->
+  <ItemGroup>
+    <DDSConvertFiles Include="Textures\**\*.png;Textures\**\*.jpg;Textures\**\*.bmp;" />
+  </ItemGroup>
+  <!--Make sure SimpleDDSConvert and AddDDStoXap is run before Xapping files-->
+  <PropertyGroup>
+    <FilesToXapDependsOn>
+      SimpleDDSConvert;
+      AddDDSToXap;
+      $(FilesToXapDependsOn);
+    </FilesToXapDependsOn>
+  </PropertyGroup>
+  <!--Target the converts input files to .dds files-->
+  <Target Name="SimpleDDSConvert" Inputs="@(DDSConvertFiles)" Outputs="@(DDSConvertFiles->'$(OutDir)%(RelativeDir)%(Filename).DDS')">
+    <!--Write what we're doing to the console-->
+    <Message Text="Converting %(DDSConvertFiles.Identity) to .dds" Importance="high" />
+    <!--Create directory structure-->
+    <MakeDir Directories="$(OutDir)%(DDSConvertFiles.RelativeDir)" />
+    <!--Call texconv.exe-->
+    <Exec Command="$(MSBuildThisFileDirectory)texconv.exe -nologo -o $(OutDir)%(RelativeDir) -ft dds -m 1 %(DDSConvertFiles.Identity)"/>
+  </Target>
+  <Target Name="AddDDSToXap">
+    <CreateItem Include="@(DDSConvertFiles->'$(OutDir)%(RelativeDir)%(Filename).DDS')"
+                AdditionalMetadata="TargetPath=%(DDSConvertFiles.RelativeDir)%(Filename).DDS">
+      <Output ItemName="XapFilesInputCollection" TaskParameter="Include" />
+    </CreateItem>
+  </Target>
+</Project>

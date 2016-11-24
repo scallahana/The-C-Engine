@@ -1,0 +1,3 @@
+We need to begin implementing a lighting system.
+I'd like to have this done by friday.
+No promises though.
